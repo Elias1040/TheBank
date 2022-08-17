@@ -42,7 +42,7 @@ static void Menu()
                 Console.Clear();
                 bank.CreateAccount(name);
                 Console.CursorVisible = false;
-                Console.WriteLine($"Konto oprettet med navn {bank.account.Name}");
+                Console.WriteLine($"Konto oprettet med navn {bank.account.Name} og nummer {bank.account.AccountNumber}");
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -51,18 +51,14 @@ static void Menu()
             case ConsoleKey.D2 or ConsoleKey.NumPad2:
                 Console.CursorVisible = true;
                 Console.Clear();
-                Console.WriteLine("Indtast beløb: ");
-                decimal amount;
-                while (!decimal.TryParse(Console.ReadLine(), out amount))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Ugyldigt input!");
-                    Console.WriteLine("Indtast beløb: ");
-                }
+                Console.WriteLine("Indtast kontonummer");
+                int number = ValidateInt();
                 Console.Clear();
+                Console.WriteLine("Indtast beløb: ");
+                decimal amount = ValidateDecimal();
                 Console.CursorVisible = false;
-                bank.Deposit(amount);
-                Console.WriteLine("Saldo efter indsæt: {0:c}", bank.Balance());
+                bool succeed = bank.Deposit(number, amount);
+                Console.WriteLine(succeed ? "Saldo efter indsæt: {0:c}": "Konto findes ikke", bank.Balance()); 
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -71,17 +67,14 @@ static void Menu()
             case ConsoleKey.D3 or ConsoleKey.NumPad3:
                 Console.CursorVisible = true;
                 Console.Clear();
-                Console.WriteLine("Indtast beløb: ");
-                while (!decimal.TryParse(Console.ReadLine(), out amount))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Ugyldigt input!");
-                    Console.WriteLine("Indtast beløb: ");
-                }
+                Console.WriteLine("Indtast kontonummer");
+                number = ValidateInt();
                 Console.Clear();
+                Console.WriteLine("Indtast beløb: ");
+                amount = ValidateDecimal();
                 Console.CursorVisible = false;
-                bank.Withdraw(amount);
-                Console.WriteLine("Saldo efter hæv: {0:c}", bank.Balance());
+                succeed = bank.Withdraw(number, amount);
+                Console.WriteLine(succeed ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance());
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -89,7 +82,7 @@ static void Menu()
             #region Balance
             case ConsoleKey.D4 or ConsoleKey.NumPad4:
                 Console.Clear();
-                Console.WriteLine("Saldo: {0:c}", bank.Balance());
+                Console.WriteLine("Saldo: {0:c}", );
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -115,4 +108,30 @@ static void Menu()
                 #endregion
         }
     } while (true);
+}
+
+static decimal ValidateDecimal()
+{
+    decimal amount;
+    while (!decimal.TryParse(Console.ReadLine(), out amount))
+    {
+        Console.Clear();
+        Console.WriteLine("Ugyldigt input!");
+        Console.WriteLine("Indtast beløb: ");
+    }
+    Console.Clear();
+    return amount;
+}
+
+static int ValidateInt()
+{
+    int amount;
+    while (!int.TryParse(Console.ReadLine(), out amount))
+    {
+        Console.Clear();
+        Console.WriteLine("Ugyldigt input!");
+        Console.WriteLine("Indtast beløb: ");
+    }
+    Console.Clear();
+    return amount;
 }

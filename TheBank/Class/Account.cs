@@ -10,11 +10,13 @@ namespace TheBank
     {
         public string Name { get; set; }
         public decimal Balance { get; set; }
+        public int AccountNumber { get; set; }
 
-        public Account (string name)
+        public Account (string name, int number)
         {
             Name = name;
             Balance = 0;
+            AccountNumber = number;
         }
     }
 }
