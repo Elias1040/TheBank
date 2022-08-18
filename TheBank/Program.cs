@@ -57,8 +57,8 @@ static void Menu()
                 Console.WriteLine("Indtast beløb: ");
                 decimal amount = ValidateDecimal();
                 Console.CursorVisible = false;
-                bool succeed = bank.Deposit(number, amount);
-                Console.WriteLine(succeed ? "Saldo efter indsæt: {0:c}": "Konto findes ikke", bank.Balance()); 
+                bool checkNull = bank.Deposit(number, amount).HasValue;
+                Console.WriteLine(checkNull ? "Saldo efter indsæt: {0:c}": "Konto findes ikke", bank.Balance(number)); 
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -73,8 +73,8 @@ static void Menu()
                 Console.WriteLine("Indtast beløb: ");
                 amount = ValidateDecimal();
                 Console.CursorVisible = false;
-                succeed = bank.Withdraw(number, amount);
-                Console.WriteLine(succeed ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance());
+                checkNull = bank.Withdraw(number, amount) != null;
+                Console.WriteLine( checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -82,7 +82,10 @@ static void Menu()
             #region Balance
             case ConsoleKey.D4 or ConsoleKey.NumPad4:
                 Console.Clear();
-                Console.WriteLine("Saldo: {0:c}", );
+                Console.WriteLine("Indtast kontonummer:");
+                number = ValidateInt();
+                checkNull = bank.Balance(number).HasValue;
+                Console.WriteLine(checkNull ? "Saldo er: {0:c}" : "Konto findes ikke", bank.Balance(number));
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -91,6 +94,7 @@ static void Menu()
             case ConsoleKey.D5 or ConsoleKey.NumPad5:
                 Console.Clear();
                 Console.WriteLine($"Bank: {bank.BankName}");
+                Console.WriteLine("Bank saldo: {0:c}", bank.BankBalance());
                 Console.ReadKey(true);
                 break;
             #endregion

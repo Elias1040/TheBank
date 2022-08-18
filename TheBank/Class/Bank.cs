@@ -38,14 +38,10 @@ namespace TheBank
         /// </summary>
         /// <param name="amount"></param>
         /// <returns>Balance after deposit</returns>
-        public bool Deposit(int accountNumber, decimal amount)
+        public decimal? Deposit(int accountNumber, decimal amount)
         {
-            if (validation.ValidateAccount(accountNumber, accounts) != null)
-            {
-                validation.ValidateAccount(accountNumber, accounts).Balance += amount;
-                return true;
-            }
-            return false;
+            Account? _account = accounts.Find(x => x.AccountNumber == accountNumber);
+            return _account != null ? _account.Balance += amount : null;
         }
 
         /// <summary>
@@ -53,44 +49,29 @@ namespace TheBank
         /// </summary>
         /// <param name="amount"></param>
         /// <returns>balance after withdrawal</returns>
-        public bool Withdraw(int accountNumber, decimal amount)
+        public decimal? Withdraw(int accountNumber, decimal amount)
         {
-            if (validation.ValidateAccount(accountNumber, accounts) != null)
-            {
-                validation.ValidateAccount(accountNumber, accounts).Balance -= amount;
-                return true;
-            }
-            return false;
+            Account? _account = accounts.Find(x => x.AccountNumber == accountNumber);
+            return _account != null ? _account.Balance -= amount : null;
         }
 
         /// <summary>
         /// Gets balance from account
         /// </summary>
         /// <returns></returns>
-        public string Balance(int accountNumber)
+        public decimal? Balance(int accountNumber)
         {
-            if (validation.ValidateAccount(accountNumber, accounts) != null)
-            {
-                return ("Saldo: {0:c}", validation.ValidateAccount(accountNumber, accounts).Balance);
-            }
-            return "Konto findes ikke";
+            Account? _account = accounts.Find(x => x.AccountNumber == accountNumber);
+            return _account != null ? _account.Balance : null;
         }
 
-        
-    }
-
-    public static class validation
-    {
-        public static Account ValidateAccount(int accountNumber, List<Account> accounts)
+        /// <summary>
+        /// Adds all balances
+        /// </summary>
+        /// <returns>sum of all</returns>
+        public decimal BankBalance()
         {
-            for (int i = 0; i < accounts.Count; i++)
-            {
-                if (accountNumber == accounts[i].AccountNumber)
-                {
-                    return accounts[i];
-                }
-            }
-            return null;
+            return accounts.AsEnumerable().Sum(x => x.Balance);
         }
     }
 }
