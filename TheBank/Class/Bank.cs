@@ -10,7 +10,6 @@ namespace TheBank
     public class Bank
     {
         public string BankName { get; }
-        public Account account { get; set; }
         List<Account> accounts = new List<Account>();
         int AccountCounter;
 
@@ -25,12 +24,30 @@ namespace TheBank
         /// </summary>
         /// <param name="name"></param>
         /// <returns>The account created</returns>
-        public Account CreateAccount(string name)
+        public Account? CreateAccount(string name, ConsoleKey accType)
         {
-            AccountCounter++;
-            account = new Account(name, AccountCounter);
-            accounts.Add(account);
-            return account;
+            Console.Clear();
+            switch (accType)
+            {
+                case ConsoleKey.D1 or ConsoleKey.NumPad1:
+                    CheckingAccount cAcc = new CheckingAccount(name, AccountCounter);
+                    accounts.Add(cAcc);
+                    AccountCounter++;
+                    return cAcc;
+                case ConsoleKey.D2 or ConsoleKey.NumPad2:
+                    SavingsAccount sAcc = new SavingsAccount(name, AccountCounter);
+                    accounts.Add(sAcc);
+                    AccountCounter++;
+                    return sAcc;
+                case ConsoleKey.D3 or ConsoleKey.NumPad3:
+                    MasterCardAccount mcAcc = new MasterCardAccount(name, AccountCounter);
+                    accounts.Add(mcAcc);
+                    AccountCounter++;
+                    return mcAcc;
+                default:
+                    Console.ReadKey(true);
+                    return null;
+            }
         }
 
         /// <summary>
@@ -71,7 +88,15 @@ namespace TheBank
         /// <returns>sum of all</returns>
         public decimal BankBalance()
         {
-            return accounts.AsEnumerable().Sum(x => x.Balance);
+            return accounts.Sum(x => x.Balance);
+        }
+
+        public void ChargeInterest()
+        {
+            foreach (Account acc in accounts)
+            {
+                acc.ChargeInterest();
+            }
         }
     }
 }

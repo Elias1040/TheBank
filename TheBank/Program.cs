@@ -7,29 +7,24 @@ static void Menu()
     Bank bank = new Bank();
 
     #region Menu List
-    List<string> menu = new List<string>();
-    menu.Add("1. Create Account");
-    menu.Add("2. Deposit");
-    menu.Add("3. Withdraw");
-    menu.Add("4. Show balance");
-    menu.Add("5. Show bank");
+    
     #endregion
 
     do
     {
         Console.Clear();
         Console.WriteLine($"Velkommen til {bank.BankName}");
-        foreach (string option in menu)
-        {
-            Console.WriteLine(option);
-        }
         Console.CursorVisible = false;
+        MenuList();
         switch (Console.ReadKey(true).Key)
         {
             #region Create account
             case ConsoleKey.D1 or ConsoleKey.NumPad1:
-                Console.CursorVisible = true;
+                Console.CursorVisible = false;
+                SubMenuList();
+                ConsoleKey type = Console.ReadKey(true).Key;
                 Console.Clear();
+                Console.CursorVisible = true;
                 Console.WriteLine("Name: ");
                 string name = Console.ReadLine();
                 while (string.IsNullOrWhiteSpace(name))
@@ -40,9 +35,9 @@ static void Menu()
                     name = Console.ReadLine();
                 }
                 Console.Clear();
-                bank.CreateAccount(name);
+                Account account = bank.CreateAccount(name, type);
                 Console.CursorVisible = false;
-                Console.WriteLine($"Konto oprettet med navn {bank.account.Name} og nummer {bank.account.AccountNumber}");
+                Console.WriteLine(account != null ? $"Konto oprettet med navn {account.Name} og nummer {account.AccountNumber}" : "fejl");
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -58,7 +53,7 @@ static void Menu()
                 decimal amount = ValidateDecimal();
                 Console.CursorVisible = false;
                 bool checkNull = bank.Deposit(number, amount).HasValue;
-                Console.WriteLine(checkNull ? "Saldo efter indsæt: {0:c}": "Konto findes ikke", bank.Balance(number)); 
+                Console.WriteLine(checkNull ? "Saldo efter indsæt: {0:c}" : "Konto findes ikke", bank.Balance(number));
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -74,7 +69,7 @@ static void Menu()
                 amount = ValidateDecimal();
                 Console.CursorVisible = false;
                 checkNull = bank.Withdraw(number, amount) != null;
-                Console.WriteLine( checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
+                Console.WriteLine(checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -96,6 +91,12 @@ static void Menu()
                 Console.WriteLine($"Bank: {bank.BankName}");
                 Console.WriteLine("Bank saldo: {0:c}", bank.BankBalance());
                 Console.ReadKey(true);
+                break;
+            #endregion
+
+            #region Charge interest
+            case ConsoleKey.D6 or ConsoleKey.NumPad6:
+                bank.ChargeInterest();
                 break;
             #endregion
 
@@ -138,4 +139,34 @@ static int ValidateInt()
     }
     Console.Clear();
     return amount;
+}
+
+static void MenuList()
+{
+    List<string> menu = new List<string>();
+    menu.Add("1. Create Account");
+    menu.Add("2. Deposit");
+    menu.Add("3. Withdraw");
+    menu.Add("4. Show balance");
+    menu.Add("5. Show bank");
+    menu.Add("6. Get interests");
+
+    foreach (string item in menu)
+    {
+        Console.WriteLine(item);
+    }
+}
+
+static void SubMenuList()
+{
+    Console.Clear();
+    List<string> subMenu = new List<string>();
+    subMenu.Add("1. Checking account");
+    subMenu.Add("2. Savings account");
+    subMenu.Add("3. Master Card account");
+
+    foreach (string item in subMenu)
+    {
+        Console.WriteLine(item);
+    }
 }
