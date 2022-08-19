@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheBank;
+using TheBank.Models;
+using TheBank.Repository;
 
-namespace TheBank
+namespace Repository.Bank
 {
-    public class Bank
+    public class Bank : IBank
     {
         public string BankName { get; }
-        List<Account> accounts = new List<Account>();
+        public List<Account> accounts = new List<Account>();
         int AccountCounter;
-
 
         public Bank()
         {
@@ -69,12 +70,21 @@ namespace TheBank
         public decimal? Withdraw(int accountNumber, decimal amount)
         {
             Account? _account = accounts.Find(x => x.AccountNumber == accountNumber);
-            return _account != null ? _account.Balance -= amount : null;
+            if ((_account.Balance - amount) < 0 && _account.AccountType == "MasterCard konto")
+            {
+                throw new OverdraftException("Du kan ikke overtrække");
+            }
+            else
+            {
+                return _account != null ? _account.Balance -= amount : null;
+            }
+            
         }
 
         /// <summary>
         /// Gets balance from account
         /// </summary>
+        /// <param name="accountNumber"></param>
         /// <returns></returns>
         public decimal? Balance(int accountNumber)
         {
@@ -91,12 +101,24 @@ namespace TheBank
             return accounts.Sum(x => x.Balance);
         }
 
+        /// <summary>
+        /// Adds interest to all accounts
+        /// </summary>
         public void ChargeInterest()
         {
             foreach (Account acc in accounts)
             {
                 acc.ChargeInterest();
             }
+        }
+        public List<AccountListItem> GetAccountList()
+        {
+            List<AccountListItem> accountList = new List<AccountListItem>();
+            foreach (Account acc in accounts)
+            {
+                accountList.Add(new AccountListItem(acc));
+            }
+            return accountList;
         }
     }
 }

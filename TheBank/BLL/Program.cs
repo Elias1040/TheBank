@@ -1,4 +1,6 @@
-﻿using TheBank;
+﻿using Repository.Bank;
+using TheBank;
+using TheBank.Models;
 
 Menu();
 
@@ -7,7 +9,7 @@ static void Menu()
     Bank bank = new Bank();
 
     #region Menu List
-    
+
     #endregion
 
     do
@@ -31,13 +33,13 @@ static void Menu()
                 {
                     Console.Clear();
                     Console.WriteLine("Navn kan ikke være tomt!");
-                    Console.WriteLine("Name: ");
+                    Console.WriteLine("Navn: ");
                     name = Console.ReadLine();
                 }
                 Console.Clear();
                 Account account = bank.CreateAccount(name, type);
                 Console.CursorVisible = false;
-                Console.WriteLine(account != null ? $"Konto oprettet med navn {account.Name} og nummer {account.AccountNumber}" : "fejl");
+                Console.WriteLine(account != null ? $"{account.AccountType} oprettet med navn {account.Name} og nummer {account.AccountNumber}" : "fejl");
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -60,17 +62,27 @@ static void Menu()
 
             #region Withdraw
             case ConsoleKey.D3 or ConsoleKey.NumPad3:
-                Console.CursorVisible = true;
-                Console.Clear();
-                Console.WriteLine("Indtast kontonummer");
-                number = ValidateInt();
-                Console.Clear();
-                Console.WriteLine("Indtast beløb: ");
-                amount = ValidateDecimal();
-                Console.CursorVisible = false;
-                checkNull = bank.Withdraw(number, amount) != null;
-                Console.WriteLine(checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
-                Console.ReadKey(true);
+                try
+                {
+
+                    Console.CursorVisible = true;
+                    Console.Clear();
+                    Console.WriteLine("Indtast kontonummer");
+                    number = ValidateInt();
+                    Console.Clear();
+                    Console.WriteLine("Indtast beløb: ");
+                    amount = ValidateDecimal();
+                    Console.CursorVisible = false;
+                    checkNull = bank.Withdraw(number, amount) != null;
+                    Console.WriteLine(checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
+                    Console.ReadKey(true);
+                }
+                catch (OverdraftException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                    Console.ReadKey(true);
+                }
+                catch (Exception) { }
                 break;
             #endregion
 
@@ -97,6 +109,18 @@ static void Menu()
             #region Charge interest
             case ConsoleKey.D6 or ConsoleKey.NumPad6:
                 bank.ChargeInterest();
+                break;
+            #endregion
+
+            #region Show all accounts
+            case ConsoleKey.D7:
+                Console.Clear();
+                //Console.WriteLine("Konto navn\tKonto type\tKonto saldo");
+                foreach (AccountListItem accItem in bank.GetAccountList())
+                {
+                    Console.WriteLine($"{accItem.Account.Name}\t{accItem.Account.AccountType}\t{accItem.Account.Balance}");
+                }
+                Console.ReadKey(true);
                 break;
             #endregion
 
@@ -150,6 +174,7 @@ static void MenuList()
     menu.Add("4. Show balance");
     menu.Add("5. Show bank");
     menu.Add("6. Get interests");
+    menu.Add("7. Show all accounts");
 
     foreach (string item in menu)
     {
