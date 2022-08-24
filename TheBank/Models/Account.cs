@@ -14,6 +14,6 @@ namespace TheBank
         public int AccountNumber { get; set; }
         public string AccountType { get; set; }
 
-        public abstract void ChargeInterest();
+        public abstract decimal ChargeInterest();
     }
 }

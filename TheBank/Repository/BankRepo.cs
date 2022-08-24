@@ -20,7 +20,6 @@ namespace TheBank.Repository
         /// <returns>The account created</returns>
         public Account? CreateAccount(string name, ConsoleKey accType)
         {
-            //Console.Clear();
             switch (accType)
             {
                 case ConsoleKey.D1 or ConsoleKey.NumPad1:

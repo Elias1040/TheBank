@@ -11,83 +11,105 @@ namespace TheBankTest
         [InlineData("a", ConsoleKey.D1)]
         [InlineData("a", ConsoleKey.D2)]
         [InlineData("a", ConsoleKey.D3)]
-        public void CreateAccountTest(string name, ConsoleKey key)
+        public void Check_if_account_created(string name, ConsoleKey key)
         {
-            BankRepo bankRepo = new BankRepo();
+            //Arrange
+            BankRepo bankRepo = new();
+
+            // Act
             AccountListItem acc = new(bankRepo.CreateAccount(name, key));
-            Assert.Contains(acc, bankRepo.GetAccountList());
+
+            // Assert
+            Assert.All(bankRepo.GetAccountList(), x => Assert.Contains(acc.Account.Name, x.Account.Name));
         }
 
         [Fact]
-        public void DepositTest()
+        public void Check_for_deposit_from_account()
         {
+            // Arrange
             BankRepo bankRepo = new();
-            Account account = bankRepo.CreateAccount("a", ConsoleKey.D1);
+
+            // Act
+            bankRepo.CreateAccount("a", ConsoleKey.D1);
+            
+            // Assert
             Assert.Equal(100, bankRepo.Deposit(0, 100));
         }
 
         [Fact]
-        public void WithdrawTest()
+        public void Check_for_withdraw_from_account()
         {
+            // Arrange
             BankRepo bankRepo = new();
-            Account account = bankRepo.CreateAccount("a", ConsoleKey.D1);
+
+            // Act
+            bankRepo.CreateAccount("a", ConsoleKey.D1);
+
+            // Assert
             Assert.Equal(-100, bankRepo.Withdraw(0, 100));
         }
 
         [Fact]
-        public void BalanceTest()
+        public void Check_account_balance()
         {
+            //Arrange
             BankRepo bankRepo = new();
-            Account account = bankRepo.CreateAccount("a", ConsoleKey.D1);
-            Assert.Equal(bankRepo.Deposit(0, 100), bankRepo.Balance(0));
+            bankRepo.CreateAccount("a", ConsoleKey.D1);
+            
+            // Act
+            bankRepo.Deposit(0, 100);
+            
+            // Assert
+            Assert.Equal(100, bankRepo.Balance(0));
         }
 
         [Fact]
-        public void BankBalanceTest()
+        public void Check_bank_balance()
         {
+            // Arrange
             BankRepo bankRepo = new();
-            Account account = bankRepo.CreateAccount("a", ConsoleKey.D1);
-            Account account1 = bankRepo.CreateAccount("a", ConsoleKey.D1);
+            bankRepo.CreateAccount("a", ConsoleKey.D1);
+            bankRepo.CreateAccount("a", ConsoleKey.D1);
+            
+            // Act
             bankRepo.Deposit(0, 100);
-            bankRepo.Deposit(1, -100);
-            Assert.Equal(0, bankRepo.BankBalance());
+            bankRepo.Deposit(1, 100);
+            
+            // Assert
+            Assert.Equal(200, bankRepo.BankBalance());
         }
 
         [Theory]
         [InlineData("a", ConsoleKey.D1, 100)]
         [InlineData("a", ConsoleKey.D2, 100)]
         [InlineData("a", ConsoleKey.D3, 100)]
-        public void ChargeInterest(string name, ConsoleKey key, int amount)
+        [InlineData("a", ConsoleKey.D3, 51000)]
+        [InlineData("a", ConsoleKey.D3, 110000)]
+        public void Check_balance_after_charging_interest(string name, ConsoleKey key, int amount)
         {
+            // Arrange
             BankRepo bankRepo = new();
             Account account = bankRepo.CreateAccount(name, key);
-            //Account account1 = bankRepo.CreateAccount("a", ConsoleKey.D2);
-            //Account account2 = bankRepo.CreateAccount("a", ConsoleKey.D3);
 
+            // Act
             bankRepo.Deposit(account.AccountNumber, amount);
-            //bankRepo.Deposit(1, 100);
-            //bankRepo.Deposit(2, 100);
-
             bankRepo.ChargeInterest();
-            switch (account.AccountType)
-            {
-                case "Lønkonto":
-                Assert.Equal(, bankRepo.Balance(0));
-                    break;
-                default:
-                    break;
-            }
-            Assert.Equal(account.ChargeInterest(amount), bankRepo.Balance(0));
-            //Assert.Equal(100*1.01m, bankRepo.Balance(1));
-            //Assert.Equal(100*1.01m, bankRepo.Balance(2));
+            
+            // Assert
+            Assert.Equal(account?.ChargeInterest(), bankRepo?.Balance(0));
         }
 
         [Fact]
         public void Check_if_same_account()
         {
+            // Arrange
             BankRepo bankRepo = new();
             AccountListItem createdAcc = new(bankRepo.CreateAccount("", ConsoleKey.D1));
+            
+            // Act
             AccountListItem acc = bankRepo.GetAccountList().Find(x => x.Account.AccountNumber == 0);
+            
+            // Assert
             Assert.NotSame(createdAcc, acc);
         }
 

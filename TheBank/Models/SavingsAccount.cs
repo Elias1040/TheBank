@@ -15,7 +15,7 @@ namespace TheBank.Models
             AccountType = "Opsparingskonto";
         }
 
-        public override void ChargeInterest()
+        public override decimal ChargeInterest()
         {
             if (Balance > 100000)
             {
@@ -29,6 +29,7 @@ namespace TheBank.Models
             {
                 Balance *= 1.01m;
             }
+            return Balance;
         }
     }
 }

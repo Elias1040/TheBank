@@ -15,9 +15,9 @@ namespace TheBank.Models
             AccountType = "Lønkonto";
         }
 
-        public override void ChargeInterest()
+        public override decimal ChargeInterest()
         {
-            Balance *= 1.005m;
+            return Balance *= 1.005m;
         }
 
     }

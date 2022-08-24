@@ -14,7 +14,7 @@ namespace TheBank.Models
             AccountNumber = accountNumber;
             AccountType = "MasterCard konto";
         }
-        public override void ChargeInterest()
+        public override decimal ChargeInterest()
         {
             if (Balance > 0)
             {
@@ -24,6 +24,7 @@ namespace TheBank.Models
             {
                 Balance *= 1.2m;
             }
+            return Balance;
         }
     }
 }
