@@ -8,7 +8,7 @@ namespace TheBank.Models
 {
     public record CheckingAccount : Account
     {
-        public CheckingAccount(string name, int accountNumber)
+        public CheckingAccount(string name, int accountNumber) : base()
         {
             Name = name;
             AccountNumber = accountNumber;

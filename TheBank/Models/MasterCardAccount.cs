@@ -8,7 +8,7 @@ namespace TheBank.Models
 {
     public record MasterCardAccount : Account
     {
-        public MasterCardAccount(string name, int accountNumber)
+        public MasterCardAccount(string name, int accountNumber) : base()
         {
             Name = name;
             AccountNumber = accountNumber;

@@ -1,16 +1,21 @@
 ﻿using Repository.Bank;
 using TheBank;
 using TheBank.Models;
+using Microsoft.Extensions.DependencyInjection;
+using TheBank.Repository;
 
-Menu();
+ServiceProvider serviceProvider = new ServiceCollection()
+            .AddSingleton<IBank, BankRepo>()
+            .BuildServiceProvider();
+Menu(serviceProvider);
 
-static void Menu()
+static void Menu(ServiceProvider sp)
 {
-    Bank bank = new Bank();
-
-    #region Menu List
-
-    #endregion
+    if (sp == null)
+    {
+        Environment.Exit(0);
+    }
+    Bank bank = new(sp.GetService<IBank>());
 
     do
     {
@@ -36,8 +41,8 @@ static void Menu()
                     Console.WriteLine("Navn: ");
                     name = Console.ReadLine();
                 }
+                Account account = bank._bank.CreateAccount(name, type);
                 Console.Clear();
-                Account account = bank.CreateAccount(name, type);
                 Console.CursorVisible = false;
                 Console.WriteLine(account != null ? $"{account.AccountType} oprettet med navn {account.Name} og nummer {account.AccountNumber}" : "fejl");
                 Console.ReadKey(true);
@@ -54,8 +59,8 @@ static void Menu()
                 Console.WriteLine("Indtast beløb: ");
                 decimal amount = ValidateDecimal();
                 Console.CursorVisible = false;
-                bool checkNull = bank.Deposit(number, amount).HasValue;
-                Console.WriteLine(checkNull ? "Saldo efter indsæt: {0:c}" : "Konto findes ikke", bank.Balance(number));
+                bool checkNull = bank._bank.Deposit(number, amount).HasValue;
+                Console.WriteLine(checkNull ? $"Saldo efter indsæt: {bank._bank.Balance(number):c}" : "Konto findes ikke");
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -73,8 +78,8 @@ static void Menu()
                     Console.WriteLine("Indtast beløb: ");
                     amount = ValidateDecimal();
                     Console.CursorVisible = false;
-                    checkNull = bank.Withdraw(number, amount) != null;
-                    Console.WriteLine(checkNull ? "Saldo efter hæv: {0:c}" : "Konto findes ikke", bank.Balance(number));
+                    checkNull = bank._bank.Withdraw(number, amount) != null;
+                    Console.WriteLine(checkNull ? $"Saldo efter hæv: {bank._bank.Balance(number):c}" : "Konto findes ikke");
                     Console.ReadKey(true);
                 }
                 catch (OverdraftException exception)
@@ -91,8 +96,8 @@ static void Menu()
                 Console.Clear();
                 Console.WriteLine("Indtast kontonummer:");
                 number = ValidateInt();
-                checkNull = bank.Balance(number).HasValue;
-                Console.WriteLine(checkNull ? "Saldo er: {0:c}" : "Konto findes ikke", bank.Balance(number));
+                checkNull = bank._bank.Balance(number).HasValue;
+                Console.WriteLine(checkNull ? $"Saldo er: {bank._bank.Balance(number):c}" : "Konto findes ikke");
                 Console.ReadKey(true);
                 break;
             #endregion
@@ -101,22 +106,21 @@ static void Menu()
             case ConsoleKey.D5 or ConsoleKey.NumPad5:
                 Console.Clear();
                 Console.WriteLine($"Bank: {bank.BankName}");
-                Console.WriteLine("Bank saldo: {0:c}", bank.BankBalance());
+                Console.WriteLine($"Bank saldo: {bank._bank.BankBalance():c}");
                 Console.ReadKey(true);
                 break;
             #endregion
 
             #region Charge interest
             case ConsoleKey.D6 or ConsoleKey.NumPad6:
-                bank.ChargeInterest();
+                bank._bank.ChargeInterest();
                 break;
             #endregion
 
             #region Show all accounts
             case ConsoleKey.D7:
                 Console.Clear();
-                //Console.WriteLine("Konto navn\tKonto type\tKonto saldo");
-                foreach (AccountListItem accItem in bank.GetAccountList())
+                foreach (AccountListItem accItem in bank._bank.GetAccountList())
                 {
                     Console.WriteLine($"{accItem.Account.Name}\t{accItem.Account.AccountType}\t{accItem.Account.Balance}");
                 }
@@ -167,14 +171,16 @@ static int ValidateInt()
 
 static void MenuList()
 {
-    List<string> menu = new List<string>();
-    menu.Add("1. Create Account");
-    menu.Add("2. Deposit");
-    menu.Add("3. Withdraw");
-    menu.Add("4. Show balance");
-    menu.Add("5. Show bank");
-    menu.Add("6. Get interests");
-    menu.Add("7. Show all accounts");
+    List<string> menu = new()
+    {
+        "1. Create Account",
+        "2. Deposit",
+        "3. Withdraw",
+        "4. Show balance",
+        "5. Show bank",
+        "6. Get interests",
+        "7. Show all accounts"
+    };
 
     foreach (string item in menu)
     {
@@ -185,10 +191,12 @@ static void MenuList()
 static void SubMenuList()
 {
     Console.Clear();
-    List<string> subMenu = new List<string>();
-    subMenu.Add("1. Checking account");
-    subMenu.Add("2. Savings account");
-    subMenu.Add("3. Master Card account");
+    List<string> subMenu = new()
+    {
+        "1. Checking account",
+        "2. Savings account",
+        "3. Master Card account"
+    };
 
     foreach (string item in subMenu)
     {
